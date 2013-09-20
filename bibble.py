@@ -1,6 +1,7 @@
 import sys
 from pybtex.database.input import bibtex
 import jinja2
+import jinja2.sandbox
 
 def _author_fmt(author):
     return u' '.join(author.first() + author.middle() + author.last())
@@ -18,7 +19,7 @@ def _author_list(authors):
 
 def main(bibfile, template):
     # Load the template.
-    tenv = jinja2.Environment()
+    tenv = jinja2.sandbox.SandboxedEnvironment()
     tenv.filters['author_fmt'] = _author_fmt
     tenv.filters['author_list'] = _author_list
     with open(template) as f:
