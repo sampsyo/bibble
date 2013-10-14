@@ -49,6 +49,9 @@ def _title(entry):
         title = entry.fields['chapter']
     else:
         title = entry.fields['title']
+
+    # remove curlies from titles -- useful in TeX, not here
+    title = title.translate(None, '{}')
     return title
 
 def main(bibfile, template):
