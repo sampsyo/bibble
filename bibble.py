@@ -17,13 +17,24 @@ def _andlist(ss, sep=', ', seplast=', and ', septwo=' and '):
 def _author_list(authors):
     return _andlist(map(_author_fmt, authors))
 
+def _venue_type(entry):
+    venuetype = ''
+    if entry.type == 'inbook':
+        venuetype = 'Chapter in '
+    elif entry.type == 'techreport':
+        venuetype = 'Technical Report '
+    elif entry.type == 'phdthesis':
+        venuetype = 'Ph.D. thesis, {}'.format(entry.fields['school'])
+    return venuetype
+
 def _venue(entry):
     f = entry.fields
+    venue = ''
     if entry.type == 'article':
         venue = f['journal']
         try:
             if f['volume'] and f['number']:
-                venue += '{0}({1})'.format(f['volume'], f['number'])
+                venue += ' {0}({1})'.format(f['volume'], f['number'])
         except KeyError:
             pass
     elif entry.type == 'inproceedings':
@@ -34,12 +45,11 @@ def _venue(entry):
         except KeyError:
             pass
     elif entry.type == 'inbook':
-        venue = 'Chapter in {}'.format(f['title'])
+        venue = f['title']
     elif entry.type == 'techreport':
-        venue = 'Technical report {0}, {1}'.format(f['number'],
-                                                   f['institution'])
+        venue = '{0}, {1}'.format(f['number'], f['institution'])
     elif entry.type == 'phdthesis':
-        venue = 'Ph.D. thesis, {}'.format(f['school'])
+        venue = ''
     else:
         venue = 'Unknown venue (type={})'.format(entry.type)
     return venue
@@ -49,7 +59,31 @@ def _title(entry):
         title = entry.fields['chapter']
     else:
         title = entry.fields['title']
+
+    # remove curlies from titles -- useful in TeX, not here
+    title = title.translate(None, '{}')
     return title
+
+def _main_url(entry):
+    urlfields = ('url', 'ee')
+    for f in urlfields:
+        if f in entry.fields:
+            return entry.fields[f]
+    return None
+
+def _extra_urls(entry):
+    """Returns a dict of URL types to URLs, e.g.
+       { 'nytimes': 'http://nytimes.com/story/about/research.html',
+          ... }
+    """
+    urls = {}
+    for k, v in entry.fields.iteritems():
+        if not k.endswith('_url'):
+            continue
+        k = k[:-4]
+        urltype = k.replace('_', ' ')
+        urls[urltype] = v
+    return urls
 
 def main(bibfile, template):
     # Load the template.
@@ -57,7 +91,10 @@ def main(bibfile, template):
     tenv.filters['author_fmt'] = _author_fmt
     tenv.filters['author_list'] = _author_list
     tenv.filters['title'] = _title
+    tenv.filters['venue_type'] = _venue_type
     tenv.filters['venue'] = _venue
+    tenv.filters['main_url'] = _main_url
+    tenv.filters['extra_urls'] = _extra_urls
     with open(template) as f:
         tmpl = tenv.from_string(f.read())
 
