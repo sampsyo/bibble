@@ -7,7 +7,7 @@
     </head>
     <body>
         <ul>
-            {% for entry in entries %}
+            {% for k, entry in entries %}
             <li>
                 <span class="authors">
                     {{ entry.persons['author']|author_list }}.

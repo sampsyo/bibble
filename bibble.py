@@ -3,6 +3,11 @@ from pybtex.database.input import bibtex
 import jinja2
 import jinja2.sandbox
 
+_months = {
+    'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
+    'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12,
+}
+
 def _author_fmt(author):
     return u' '.join(author.first() + author.middle() + author.last())
 
@@ -85,6 +90,19 @@ def _extra_urls(entry):
         urls[urltype] = v
     return urls
 
+def _month_match (mon):
+    return _months[mon.lower()[:3]]
+
+def _sortkey (x):
+    e = x[1].fields
+    year =  '{:04d}'.format(int(e['year']))
+    try:
+        monthnum = _month_match(e['month'])
+        year += '{:02d}'.format(monthnum)
+    except KeyError:
+        year += '00'
+    return year
+
 def main(bibfile, template):
     # Load the template.
     tenv = jinja2.sandbox.SandboxedEnvironment()
@@ -103,7 +121,8 @@ def main(bibfile, template):
         db = bibtex.Parser().parse_stream(f)
 
     # Render the template.
-    out = tmpl.render(entries=db.entries.values())
+    bib_sorted = sorted(db.entries.items(), key=_sortkey, reverse=True)
+    out = tmpl.render(entries=bib_sorted)
     print out
 
 if __name__ == '__main__':
