@@ -93,8 +93,8 @@ def _extra_urls(entry):
 def _month_match (mon):
     return _months[mon.lower()[:3]]
 
-def _sortkey (x):
-    e = x[1].fields
+def _sortkey(entry):
+    e = entry.fields
     year =  '{:04d}'.format(int(e['year']))
     try:
         monthnum = _month_match(e['month'])
@@ -121,7 +121,7 @@ def main(bibfile, template):
         db = bibtex.Parser().parse_stream(f)
 
     # Render the template.
-    bib_sorted = sorted(db.entries.items(), key=_sortkey, reverse=True)
+    bib_sorted = sorted(db.entries.values(), key=_sortkey, reverse=True)
     out = tmpl.render(entries=bib_sorted)
     print out
 
