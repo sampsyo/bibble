@@ -120,6 +120,10 @@ def main(bibfile, template):
     with open(bibfile) as f:
         db = bibtex.Parser().parse_stream(f)
 
+    # Include the bibliography key in each entry.
+    for k, v in db.entries.items():
+        v.fields['key'] = k
+
     # Render the template.
     bib_sorted = sorted(db.entries.values(), key=_sortkey, reverse=True)
     out = tmpl.render(entries=bib_sorted)
