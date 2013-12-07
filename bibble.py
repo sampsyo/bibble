@@ -2,6 +2,8 @@ import sys
 from pybtex.database.input import bibtex
 import jinja2
 import jinja2.sandbox
+import re
+from calendar import month_name
 
 _months = {
     'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
@@ -91,7 +93,15 @@ def _extra_urls(entry):
     return urls
 
 def _month_match (mon):
+    if re.match('^[0-9]+$', mon):
+        return int(mon)
     return _months[mon.lower()[:3]]
+
+def _month_name (monthnum):
+    try:
+        return month_name[int(monthnum)]
+    except:
+        return ''
 
 def _sortkey(entry):
     e = entry.fields
@@ -113,6 +123,7 @@ def main(bibfile, template):
     tenv.filters['venue'] = _venue
     tenv.filters['main_url'] = _main_url
     tenv.filters['extra_urls'] = _extra_urls
+    tenv.filters['monthname'] = _month_name
     with open(template) as f:
         tmpl = tenv.from_string(f.read())
 
