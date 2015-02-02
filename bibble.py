@@ -87,6 +87,7 @@ def _extra_urls(entry):
     """
     urls = {}
     for k, v in entry.fields.iteritems():
+        k = k.lower()
         if not k.endswith('_url'):
             continue
         k = k[:-4]
