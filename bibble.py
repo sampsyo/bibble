@@ -32,6 +32,8 @@ def _venue_type(entry):
         venuetype = 'Technical Report '
     elif entry.type == 'phdthesis':
         venuetype = 'Ph.D. thesis, {}'.format(entry.fields['school'])
+    elif entry.type == 'mastersthesis':
+        venuetype = 'Master\'s thesis, {}'.format(entry.fields['school'])
     return venuetype
 
 def _venue(entry):
@@ -55,7 +57,7 @@ def _venue(entry):
         venue = f['title']
     elif entry.type == 'techreport':
         venue = '{0}, {1}'.format(f['number'], f['institution'])
-    elif entry.type == 'phdthesis':
+    elif entry.type == 'phdthesis' or entry.type == 'mastersthesis':
         venue = ''
     else:
         venue = 'Unknown venue (type={})'.format(entry.type)
@@ -85,6 +87,7 @@ def _extra_urls(entry):
     """
     urls = {}
     for k, v in entry.fields.iteritems():
+        k = k.lower()
         if not k.endswith('_url'):
             continue
         k = k[:-4]
