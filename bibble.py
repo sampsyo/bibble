@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import re
 from calendar import month_name
 
@@ -118,7 +117,7 @@ def _month_match(mon):
 def _month_name(monthnum):
     try:
         return month_name[int(monthnum)]
-    except:
+    except (ValueError, KeyError):
         return ''
 
 
@@ -138,6 +137,7 @@ def _sortkey(entry):
 @click.argument('template', metavar='TEMPLATE.html', type=click.File('r'))
 @click.option('-o', '--output', type=click.File('w'))
 def main(bibfile, template, output):
+    # pylint: disable=unused-argument
     """Render a bibtex .bib file to HTML using an HTML template."""
     tenv = jinja2.sandbox.SandboxedEnvironment()
     tenv.filters['author_fmt'] = _author_fmt
@@ -164,4 +164,5 @@ def main(bibfile, template, output):
 
 
 if __name__ == '__main__':
+    # pylint: disable=no-value-for-parameter
     main()
