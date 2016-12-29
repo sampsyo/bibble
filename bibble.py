@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+
 import sys
+import re
+from calendar import month_name
+
+import click
 from pybtex.database.input import bibtex
 import jinja2
 import jinja2.sandbox
-import re
-from calendar import month_name
 
 _months = {
     'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
@@ -116,8 +120,12 @@ def _sortkey(entry):
         year += '00'
     return year
 
-def main(bibfile, template):
-    # Load the template.
+@click.command()
+@click.argument('bibfile', metavar='BIBFILE.bib', type=click.File('r'))
+@click.argument('template', metavar='TEMPLATE.html', type=click.File('r'))
+@click.option('-o', '--output', type=click.File('w'))
+def main(bibfile, template, output):
+    """Render a bibtex .bib file to HTML using an HTML template."""
     tenv = jinja2.sandbox.SandboxedEnvironment()
     tenv.filters['author_fmt'] = _author_fmt
     tenv.filters['author_list'] = _author_list
@@ -127,12 +135,10 @@ def main(bibfile, template):
     tenv.filters['main_url'] = _main_url
     tenv.filters['extra_urls'] = _extra_urls
     tenv.filters['monthname'] = _month_name
-    with open(template) as f:
-        tmpl = tenv.from_string(f.read())
+    tmpl = tenv.from_string(template.read())
 
     # Parse the BibTeX file.
-    with open(bibfile) as f:
-        db = bibtex.Parser().parse_stream(f)
+    db = bibtex.Parser().parse_stream(bibfile)
 
     # Include the bibliography key in each entry.
     for k, v in db.entries.items():
@@ -144,4 +150,4 @@ def main(bibfile, template):
     print out
 
 if __name__ == '__main__':
-    main(*sys.argv[1:])
+    main()
