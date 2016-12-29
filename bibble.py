@@ -9,13 +9,16 @@ from pybtex.database.input import bibtex
 import jinja2
 import jinja2.sandbox
 
+
 _months = {
     'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
     'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12,
 }
 
+
 def _author_fmt(author):
     return u' '.join(author.first() + author.middle() + author.last())
+
 
 def _andlist(ss, sep=', ', seplast=', and ', septwo=' and '):
     if len(ss) <= 1:
@@ -25,8 +28,10 @@ def _andlist(ss, sep=', ', seplast=', and ', septwo=' and '):
     else:
         return sep.join(ss[:-1]) + seplast + ss[-1]
 
+
 def _author_list(authors):
     return _andlist(map(_author_fmt, authors))
+
 
 def _venue_type(entry):
     venuetype = ''
@@ -39,6 +44,7 @@ def _venue_type(entry):
     elif entry.type == 'mastersthesis':
         venuetype = 'Master\'s thesis, {}'.format(entry.fields['school'])
     return venuetype
+
 
 def _venue(entry):
     f = entry.fields
@@ -67,6 +73,7 @@ def _venue(entry):
         venue = 'Unknown venue (type={})'.format(entry.type)
     return venue
 
+
 def _title(entry):
     if entry.type == 'inbook':
         title = entry.fields['chapter']
@@ -77,12 +84,14 @@ def _title(entry):
     title = title.translate(None, '{}')
     return title
 
+
 def _main_url(entry):
     urlfields = ('url', 'ee')
     for f in urlfields:
         if f in entry.fields:
             return entry.fields[f]
     return None
+
 
 def _extra_urls(entry):
     """Returns a dict of URL types to URLs, e.g.
@@ -99,26 +108,30 @@ def _extra_urls(entry):
         urls[urltype] = v
     return urls
 
-def _month_match (mon):
+
+def _month_match(mon):
     if re.match('^[0-9]+$', mon):
         return int(mon)
     return _months[mon.lower()[:3]]
 
-def _month_name (monthnum):
+
+def _month_name(monthnum):
     try:
         return month_name[int(monthnum)]
     except:
         return ''
 
+
 def _sortkey(entry):
     e = entry.fields
-    year =  '{:04d}'.format(int(e['year']))
+    year = '{:04d}'.format(int(e['year']))
     try:
         monthnum = _month_match(e['month'])
         year += '{:02d}'.format(monthnum)
     except KeyError:
         year += '00'
     return year
+
 
 @click.command()
 @click.argument('bibfile', metavar='BIBFILE.bib', type=click.File('r'))
@@ -148,6 +161,7 @@ def main(bibfile, template, output):
     bib_sorted = sorted(db.entries.values(), key=_sortkey, reverse=True)
     out = tmpl.render(entries=bib_sorted)
     print out
+
 
 if __name__ == '__main__':
     main()
