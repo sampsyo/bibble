@@ -8,12 +8,12 @@ Install in a virtualenv:
 
     $ virtualenv venv
     $ . venv/bin/activate
-    (venv)$ pip install -r .requirements.txt
+    (venv)$ pip install -e .
 
-Give `bibble.py` the name of a BibTeX file and a template. A sample template is
+Give `bibble` the name of a BibTeX file and a template. A sample template is
 included.
 
-    (venv)$ python bibble.py citations.bib simple.html > citations.html
+    (venv)$ bibble citations.bib simple.html > citations.html
 
 [Pybtex]: http://pybtex.sourceforge.net/
 [Jinja2]: http://jinja.pocoo.org/
