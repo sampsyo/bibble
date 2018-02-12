@@ -29,7 +29,7 @@ def _andlist(ss, sep=', ', seplast=', and ', septwo=' and '):
 
 
 def _author_list(authors):
-    return _andlist(map(_author_fmt, authors))
+    return _andlist(list(map(_author_fmt, authors)))
 
 
 def _venue_type(entry):
@@ -80,7 +80,7 @@ def _title(entry):
         title = entry.fields['title']
 
     # remove curlies from titles -- useful in TeX, not here
-    title = title.translate(None, '{}')
+    title = title.replace('{','').replace('}','')
     return title
 
 
@@ -98,7 +98,7 @@ def _extra_urls(entry):
           ... }
     """
     urls = {}
-    for k, v in entry.fields.iteritems():
+    for k, v in entry.fields.items():
         k = k.lower()
         if not k.endswith('_url'):
             continue
@@ -160,7 +160,7 @@ def main(bibfile, template, output):
     # Render the template.
     bib_sorted = sorted(db.entries.values(), key=_sortkey, reverse=True)
     out = tmpl.render(entries=bib_sorted)
-    print out
+    print(out)
 
 
 if __name__ == '__main__':
