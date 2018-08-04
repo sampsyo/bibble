@@ -70,6 +70,9 @@ def _venue(entry):
         venue = ''
     else:
         venue = 'Unknown venue (type={})'.format(entry.type)
+
+    # remove curlies from venues -- useful in TeX, not here
+    venue = venue.replace('{','').replace('}','')
     return venue
 
 
