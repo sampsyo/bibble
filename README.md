@@ -6,9 +6,9 @@ converter using [Pybtex][] and [Jinja2][].
 
 Install in a virtualenv:
 
-    $ virtualenv venv
-    $ . venv/bin/activate
-    (venv)$ pip install -e .
+    $ python3 -m venv .venv
+    $ . .venv/bin/activate
+    (.venv)$ pip install -e .
 
 Give `bibble` the name of a BibTeX file and a template. A sample template is
 included.
