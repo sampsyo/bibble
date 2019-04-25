@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+"""Main functionality for bibble."""
+
+# pylint doesn't like our concise variable names; yolo
+# pylint: disable=invalid-name
 
 import re
 from calendar import month_name
@@ -9,30 +13,36 @@ import jinja2
 import jinja2.sandbox
 
 
-_months = {
+MONTHS = {
     'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
     'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12,
 }
 
 
 def _author_fmt(author):
+    """Format an author's full name."""
     return u' '.join(author.first() + author.middle() + author.last())
 
 
 def _andlist(ss, sep=', ', seplast=', and ', septwo=' and '):
+    """Comma-separate a list of strings according to English rules.
+
+    Enforces the Oxford comma.
+    """
     if len(ss) <= 1:
         return ''.join(ss)
-    elif len(ss) == 2:
+    if len(ss) == 2:
         return septwo.join(ss)
-    else:
-        return sep.join(ss[:-1]) + seplast + ss[-1]
+    return sep.join(ss[:-1]) + seplast + ss[-1]
 
 
 def _author_list(authors):
+    """Format a list of authors."""
     return _andlist(list(map(_author_fmt, authors)))
 
 
 def _venue_type(entry):
+    """Expand a venue type to a longer English description."""
     venuetype = ''
     if entry.type == 'inbook':
         venuetype = 'Chapter in '
@@ -46,6 +56,7 @@ def _venue_type(entry):
 
 
 def _venue(entry):
+    """Format an entry's venue data."""
     f = entry.fields
     venue = ''
     if entry.type == 'article':
@@ -74,17 +85,19 @@ def _venue(entry):
 
 
 def _title(entry):
+    """Format a title field for HTML display."""
     if entry.type == 'inbook':
         title = entry.fields['chapter']
     else:
         title = entry.fields['title']
 
     # remove curlies from titles -- useful in TeX, not here
-    title = title.replace('{','').replace('}','')
+    title = title.replace('{', '').replace('}', '')
     return title
 
 
 def _main_url(entry):
+    """Get an entry's URL field (url or ee)."""
     urlfields = ('url', 'ee')
     for f in urlfields:
         if f in entry.fields:
@@ -93,7 +106,9 @@ def _main_url(entry):
 
 
 def _extra_urls(entry):
-    """Returns a dict of URL types to URLs, e.g.
+    """Gather an entry's "*_url" fields into a dictionary.
+
+    Returns a dict of URL types to URLs, e.g.
        { 'nytimes': 'http://nytimes.com/story/about/research.html',
           ... }
     """
@@ -109,12 +124,14 @@ def _extra_urls(entry):
 
 
 def _month_match(mon):
+    """Turn a month specifier (name or number) into a month name."""
     if re.match('^[0-9]+$', mon):
         return int(mon)
-    return _months[mon.lower()[:3]]
+    return MONTHS[mon.lower()[:3]]
 
 
 def _month_name(monthnum):
+    """Turn a month number into a month name."""
     try:
         return month_name[int(monthnum)]
     except (ValueError, KeyError):
@@ -122,6 +139,7 @@ def _month_name(monthnum):
 
 
 def _sortkey(entry):
+    """Generate a sorting key for an entry based on its date."""
     e = entry.fields
     year = '{:04d}'.format(int(e['year']))
     try:
@@ -138,7 +156,7 @@ def _sortkey(entry):
 @click.option('-o', '--output', type=click.File('w'))
 def main(bibfile, template, output):
     # pylint: disable=unused-argument
-    """Render a bibtex .bib file to HTML using an HTML template."""
+    """Render a BibTeX .bib file to HTML using an HTML template."""
     tenv = jinja2.sandbox.SandboxedEnvironment()
     tenv.filters['author_fmt'] = _author_fmt
     tenv.filters['author_list'] = _author_list
