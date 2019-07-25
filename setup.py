@@ -7,13 +7,16 @@ from setuptools import setup
 
 setup(
     name='bibble',
-    version='0.0.1',
+    version='0.0.2',
     packages=['bibble'],
     include_package_data=True,
     install_requires=[
         'click',
         'jinja2',
         'pybtex',
+    ],
+    classifiers=[
+        'Programming Language :: Python :: 3',
     ],
     entry_points={
         'console_scripts': [
