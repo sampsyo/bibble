@@ -35,7 +35,7 @@ variable called `entries`:
   {% for entry in entries %}
     <li>
         {{ entry.persons['author']|author_list }}.
-        {{ entry|title}}.
+        {{ entry|title }}.
         {{ entry.fields['month'] }}
         {{ entry.fields['year'] }}.
     </li>
