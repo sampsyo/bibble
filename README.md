@@ -44,7 +44,7 @@ variable called `entries`:
 ```
 
 Bibble provides several convenience functions such as `author_list` via
-Jinja2's filter mechanism. See `simple.html` to see them all sued.
+Jinja2's filter mechanism. See `simple.html` to see them all used.
 
 ## How it Works
 
